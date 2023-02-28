@@ -1,0 +1,16 @@
+services:
+  app:
+    build:
+      dockerfile: Dockerfile
+    ports:
+      - 8080
+    environment:
+      DATABASE_URL: jdbc:postgresql://postgresql/phones
+      DATABASE_USERNAME: phones_user
+      DATABASE_PASSWORD: phones_password
+  postgresql:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: phones
+      POSTGRES_USER: phones_user
+      POSTGRES_PASSWORD: phones_password

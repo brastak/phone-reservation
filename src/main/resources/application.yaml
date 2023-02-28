@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: org.postgresql.Driver
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+  jpa:
+    open-in-view: false
+
+phones:
+  spec:
+    location: ${PHONES_SPEC_LOCATION:classpath:devices_spec.csv}
+    ttl: ${PHONES_SPEC_TTL:P1D}
+    refreshGracePeriod: ${PHONES_SPEC_REFRESH_GRACE_PERIOD:PT1H}

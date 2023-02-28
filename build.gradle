@@ -1,0 +1,89 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.0.0'
+    id 'io.spring.dependency-management' version '1.1.0'
+}
+
+group 'codes.bespoke.brastak.snippets'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    hikariVersion = '5.0.1'
+    postgresVersion = '42.5.1'
+    mapStructVersion = '1.5.3.Final'
+    opencsvVersion = '5.7.1'
+    liquibaseVersion = '4.19.0'
+    springDocOpenApiVersion = '2.0.2'
+    jacksonVersion = '2.14.1'
+    junitVersion = '5.8.1'
+    lombokVersion = '1.18.22'
+}
+
+dependencies {
+    // SpringBoot dependencies
+    implementation ('org.springframework.boot:spring-boot-starter-web') {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
+    implementation ('org.springframework.boot:spring-boot-starter-data-jpa') {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
+    runtimeOnly ('org.springframework.boot:spring-boot-starter-validation') {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
+    // Use Log4J2 instead of SLF4J
+    implementation 'org.springframework.boot:spring-boot-starter-log4j2'
+
+    // Log4J2 YAML config support
+    runtimeOnly "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}"
+
+    // Lombok dependencies
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+    // MapStruct dependencies
+    implementation "org.mapstruct:mapstruct:${mapStructVersion}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapStructVersion}"
+
+    // OpenCSV dependencies
+    implementation "com.opencsv:opencsv:${opencsvVersion}"
+
+    // Postgres database dependencies
+    runtimeOnly "com.zaxxer:HikariCP:${hikariVersion}"
+    runtimeOnly "org.postgresql:postgresql:${postgresVersion}"
+
+    // Liquibase dependencies
+    runtimeOnly ("org.liquibase:liquibase-core:${liquibaseVersion}") {
+        exclude group: 'ch.qos.logback', module: 'logback-classic'
+    }
+
+    // OpenAPI UI dependencies
+    runtimeOnly "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocOpenApiVersion}"
+
+    // JUnit dependencies
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
+    testImplementation ('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
+}
+
+test {
+    useJUnitPlatform()
+
+    jvmArgs(["--add-opens=java.base/java.lang=ALL-UNNAMED",
+             "--add-opens=java.base/java.util=ALL-UNNAMED"])
+}
+
+def activeProfile = 'local'
+bootRun {
+    systemProperty "spring.profiles.active", activeProfile
+}
+
+bootJar {
+    exclude("application-local.yaml")
+}

@@ -1,0 +1,246 @@
+databaseChangeLog:
+  - changeSet:
+      id: "1.0.1"
+      author: brastak
+      changes:
+        - createTable:
+            tableName: phone_model
+            remarks: Phone models
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                  remarks: Record ID
+              - column:
+                  name: vendor
+                  type: text
+                  constraints:
+                    nullable: false
+                  remarks: Phone vendor
+              - column:
+                  name: name
+                  type: text
+                  constraints:
+                    nullable: false
+                  remarks: Phone model name
+        - createTable:
+            tableName: phone
+            remarks: Phone devices
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                  remarks: Record ID
+              - column:
+                  name: phone_model_id
+                  type: integer
+                  constraints:
+                    foreignKeyName: fk_phone_phone_model_id
+                    referencedTableName: phone_model
+                    referencedColumnNames: id
+                    nullable: false
+                  remarks: Phone model
+              - column:
+                  name: serial_number
+                  type: text
+                  constraints:
+                    nullable: false
+                  remarks: Device serial number
+        - createTable:
+            tableName: phone_reservation
+            remarks: Phone reservations
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                  remarks: Record ID
+              - column:
+                  name: phone_id
+                  type: integer
+                  constraints:
+                    foreignKeyName: fk_phone_reservation_phone_id
+                    referencedTableName: phone
+                    referencedColumnNames: id
+                    nullable: false
+                  remarks: Phone device
+              - column:
+                  name: reserved_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+                  remarks: Reservation time
+              - column:
+                  name: reserved_by
+                  type: text
+                  constraints:
+                    nullable: false
+                  remarks: Person who reserved phone
+              - column:
+                  name: returned_at
+                  type: timestamp
+                  remarks: Return time
+  - changeSet:
+      id: "1.0.2"
+      author: brastak
+      changes:
+        - sql:
+            sql: >
+              with ins_model as (insert into phone_model(vendor, name) values ('Samsung', 'Galaxy S9') returning id)
+                insert into phone(phone_model_id, serial_number) 
+                  select id, concat(id, '0001') from ins_model
+        - sql:
+            sql: >
+              with ins_model as (insert into phone_model(vendor, name) values ('Samsung', 'Galaxy S8') returning id)
+                insert into phone(phone_model_id, serial_number) 
+                  select id, concat(id, '0001') from ins_model
+                    union all select id, concat(id, '0002') from ins_model
+        - sql:
+            sql: >
+              with ins_model as (insert into phone_model(vendor, name) values ('Motorola', 'Nexus 6') returning id)
+                insert into phone(phone_model_id, serial_number) select id, concat(id, '0001') from ins_model
+        - sql:
+            sql: >
+              with ins_model as (insert into phone_model(vendor, name) values ('OnePlus', 'OnePlus 9') returning id)
+                insert into phone(phone_model_id, serial_number) select id, concat(id, '0001') from ins_model
+        - sql:
+            sql: >
+              with ins_model as (insert into phone_model(vendor, name) values ('Apple', 'iPhone 13') returning id)
+                insert into phone(phone_model_id, serial_number) select id, concat(id, '0001') from ins_model
+        - sql:
+            sql: >
+              with ins_model as (insert into phone_model(vendor, name) values ('Apple', 'iPhone 12') returning id)
+                insert into phone(phone_model_id, serial_number) select id, concat(id, '0001') from ins_model
+        - sql:
+            sql: >
+              with ins_model as (insert into phone_model(vendor, name) values ('Apple', 'iPhone 11') returning id)
+                insert into phone(phone_model_id, serial_number) select id, concat(id, '0001') from ins_model
+        - sql:
+            sql: >
+              with ins_model as (insert into phone_model(vendor, name) values ('Apple', 'iPhone X') returning id)
+                insert into phone(phone_model_id, serial_number) select id, concat(id, '0001') from ins_model
+        - sql:
+            sql: >
+              with ins_model as (insert into phone_model(vendor, name) values ('Nokia', 'Nokia 3310') returning id)
+                insert into phone(phone_model_id, serial_number) select id, concat(id, '0001') from ins_model
+  - changeSet:
+      id: "1.0.3"
+      author: brastak
+      changes:
+        - createTable:
+            tableName: phone_spec
+            columns:
+              - column:
+                  name: phone_model_id
+                  type: int
+                  constraints:
+                    primaryKey: true
+                    foreignKeyName: fk_spec_phone_model_id
+                    referencedTableName: phone_model
+                    referencedColumnNames: id
+                  remarks: Phone model
+              - column:
+                  name: last_updated_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+                  remarks: Last update timestamp
+              - column:
+                  name: last_update_started_at
+                  type: timestamp
+                  remarks: Last update start timestamp
+        - createTable:
+            tableName: phone_spec_technology
+            columns:
+              - column:
+                  name: spec_id
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: text
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            tableName: phone_spec_technology
+            columnNames: spec_id, name
+        - createTable:
+            tableName: phone_spec_2g_band
+            columns:
+              - column:
+                  name: spec_id
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: band
+                  type: text
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            tableName: phone_spec_2g_band
+            columnNames: spec_id, band
+        - createTable:
+            tableName: phone_spec_3g_band
+            columns:
+              - column:
+                  name: spec_id
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: band
+                  type: text
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            tableName: phone_spec_3g_band
+            columnNames: spec_id, band
+        - createTable:
+            tableName: phone_spec_4g_band
+            columns:
+              - column:
+                  name: spec_id
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: band
+                  type: text
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            tableName: phone_spec_4g_band
+            columnNames: spec_id, band
+  - changeSet:
+      id: "1.0.4"
+      author: brastak
+      changes:
+        - createIndex:
+            indexName: idx_phone_phone_model_id
+            tableName: phone
+            columns:
+              - column:
+                  name: phone_model_id
+        - createIndex:
+            indexName: idx_phone_reservation_phone_id
+            tableName: phone_reservation
+            columns:
+              - column:
+                  name: phone_id
+        - createIndex:
+            indexName: idx_phone_reservation_returned_at
+            tableName: phone_reservation
+            columns:
+              - column:
+                  name: returned_at
+
